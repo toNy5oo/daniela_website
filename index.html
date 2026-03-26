@@ -164,8 +164,8 @@
         </div>
     </nav>
 
-    <!-- HERO SECTION -->
-    <header id="home" class="min-h-screen pt-40 pb-20 px-6 lg:px-12 flex items-center overflow-hidden">
+     <!-- HERO SECTION -->
+     <header id="home" class="min-h-screen pt-40 pb-20 px-6 lg:px-12 flex items-center overflow-hidden">
         <div class="max-w-7xl mx-auto w-full grid md:grid-cols-12 gap-16 items-center">
             <div class="md:col-span-7 flex flex-col items-start z-10">
                 <h1 class="reveal active text-6xl md:text-[6.5rem] leading-[0.95] font-display font-bold tracking-tightest mb-10 text-on-surface" data-i18n="hero.title">
@@ -307,7 +307,6 @@
             </div>
 
             <div class="grid md:grid-cols-2 gap-12">
-                <!-- Home Setup -->
                 <div class="reveal">
                     <div class="bg-surface-lowest p-12 shadow-ambient rounded-sm h-full border-b-8 border-primary/20 hover:border-primary/40 transition-colors">
                         <h3 class="text-xs font-bold uppercase tracking-widest text-primary mb-8">— <span data-i18n="consulting.item1.tag">Privat</span></h3>
@@ -315,7 +314,6 @@
                         <p class="text-on-surface/60 leading-relaxed" data-i18n="consulting.item1.desc"></p>
                     </div>
                 </div>
-                <!-- Gastro -->
                 <div class="reveal delay-200">
                     <div class="bg-surface-lowest p-12 shadow-ambient rounded-sm h-full border-b-8 border-primary">
                         <h3 class="text-xs font-bold uppercase tracking-widest text-primary mb-8">— <span data-i18n="consulting.item2.tag">Gastro</span></h3>
@@ -366,22 +364,34 @@
                         </div>
                     </div>
                 </div>
-                
-                <p class="mt-16 text-xs text-on-surface/40 italic leading-relaxed" data-i18n="contact.note"></p>
             </div>
 
             <div class="reveal delay-200">
-                <form class="space-y-8 font-body bg-surface-low p-12 rounded-sm shadow-xl">
+                <form id="contact-form" class="space-y-8 font-body bg-surface-low p-12 rounded-sm shadow-xl relative overflow-hidden">
+                    <div id="form-status" class="hidden absolute inset-0 bg-surface-low z-20 flex items-center justify-center text-center p-8 animate-in fade-in duration-500">
+                        <div class="flex flex-col items-center gap-4">
+                            <i id="status-icon" class="ph-bold ph-check-circle text-6xl text-primary"></i>
+                            <p id="status-message" class="font-bold text-lg leading-tight"></p>
+                            <button type="button" onclick="resetForm()" class="text-[10px] uppercase tracking-widest font-bold text-primary mt-6 border-b border-primary/20 pb-1">Neue Nachricht</button>
+                        </div>
+                    </div>
+
                     <div>
-                        <input type="text" id="form-name" class="ghost-input w-full bg-transparent border-b border-black/10 focus:border-primary px-0 py-4 outline-none text-lg transition-all" placeholder="Name">
+                        <input type="text" name="name" id="form-name" required class="ghost-input w-full bg-transparent border-b border-black/10 focus:border-primary px-0 py-4 outline-none text-lg transition-all" placeholder="Name">
                     </div>
                     <div>
-                        <input type="email" id="form-email" class="ghost-input w-full bg-transparent border-b border-black/10 focus:border-primary px-0 py-4 outline-none text-lg transition-all" placeholder="E-Mail">
+                        <input type="email" name="email" id="form-email" required class="ghost-input w-full bg-transparent border-b border-black/10 focus:border-primary px-0 py-4 outline-none text-lg transition-all" placeholder="E-Mail">
                     </div>
                     <div>
-                        <textarea rows="4" id="form-message" class="ghost-input w-full bg-transparent border-b border-black/10 focus:border-primary px-0 py-4 outline-none text-lg transition-all resize-none" placeholder="Message / Ihr Vorhaben"></textarea>
+                        <textarea rows="4" name="message" id="form-message" required class="ghost-input w-full bg-transparent border-b border-black/10 focus:border-primary px-0 py-4 outline-none text-lg transition-all resize-none" placeholder="Message / Ihr Vorhaben"></textarea>
                     </div>
-                    <button type="button" class="w-full bg-primary text-white font-bold py-5 px-10 rounded-sm hover:shadow-hover transition-all uppercase tracking-widest text-sm" data-i18n="general.send">Anfrage Senden</button>
+                    
+                    <input type="checkbox" name="botcheck" class="hidden" style="display: none;">
+
+                    <button type="submit" id="submit-btn" class="w-full bg-primary text-white font-bold py-5 px-10 rounded-sm hover:shadow-hover transition-all uppercase tracking-widest text-sm flex items-center justify-center gap-3">
+                        <span data-i18n="general.send">Anfrage Senden</span>
+                        <div id="btn-spinner" class="loading-spinner hidden"></div>
+                    </button>
                 </form>
             </div>
         </div>
@@ -434,6 +444,8 @@
     </footer>
 
     <script>
+        const WEB3FORMS_KEY = "ef8b19c2-9aec-4057-8b6f-31d54bec7bc7"
+
         const translations = {
             de: {
                 "nav.about": "Über Mich",
@@ -472,13 +484,14 @@
                 "consulting.item2.desc": "Support für Cafés und Restaurants: Von Equipmentauswahl und Rezepturentwicklung bis hin zu Barista-Training und Qualitätssicherung. Ehrlich und praxisnah.",
                 "contact.title": "Lassen Sie uns sprechen.",
                 "contact.intro": "Du hast Interesse oder Fragen? Ich freue mich auf deine Nachricht. Schreib mir einfach – ich melde mich schnellstmöglich bei dir.",
-                "contact.note": "Kurse finden je nach Verfügbarkeit bei dir, bei mir oder in passenden Locations statt.",
                 "footer.tagline": "Exzellenz in der Welt des Spezialitätenkaffees. Augsburg & Umgebung.",
                 "footer.legal1": "Impressum",
                 "footer.legal2": "Datenschutz",
                 "general.book": "Jetzt Anfragen",
                 "general.contact": "Kontakt aufnehmen",
-                "general.send": "Anfrage Senden"
+                "general.send": "Anfrage Senden",
+                "form.success": "Nachricht gesendet! Ich melde mich bald bei Ihnen.",
+                "form.error": "Es gab ein Problem. Bitte versuchen Sie es erneut."
             },
             en: {
                 "nav.about": "About Me",
@@ -517,13 +530,14 @@
                 "consulting.item2.desc": "Elevate your coffee offering. From equipment selection and recipe development to barista training and quality control. Honest and hands-on.",
                 "contact.title": "Let's Talk.",
                 "contact.intro": "Interested or have questions? I'd love to hear from you. Just drop me a message – I'll get back to you as soon as possible.",
-                "contact.note": "Courses take place at your location, mine, or a suitable venue – depending on availability.",
                 "footer.tagline": "Excellence in specialty coffee. Augsburg & surrounding area.",
                 "footer.legal1": "Legal Notice",
                 "footer.legal2": "Privacy Policy",
                 "general.book": "Inquire Now",
                 "general.contact": "Get in Touch",
-                "general.send": "Send Inquiry"
+                "general.send": "Send Inquiry",
+                "form.success": "Message sent! I'll get back to you shortly.",
+                "form.error": "Something went wrong. Please try again."
             }
         };
 
@@ -532,57 +546,86 @@
 
         function setLanguage(lang) {
             currentLang = lang;
-            
             document.querySelectorAll('[data-i18n]').forEach(el => {
                 const key = el.getAttribute('data-i18n');
-                if (translations[lang][key]) {
-                    el.innerHTML = translations[lang][key];
-                }
+                if (translations[lang][key]) el.innerHTML = translations[lang][key];
             });
-
-            // Special handling for the HTML content blocks
             document.getElementById('about-content').innerHTML = translations[lang]['about.content'];
-
-            // Update placeholders for inputs
-            const nameInp = document.getElementById('form-name');
-            const mailInp = document.getElementById('form-email');
-            const msgInp = document.getElementById('form-message');
-            
-            if(nameInp) nameInp.placeholder = lang === 'en' ? "Name" : "Ihr Name";
-            if(mailInp) mailInp.placeholder = lang === 'en' ? "Email" : "E-Mail";
-            if(msgInp) msgInp.placeholder = lang === 'en' ? "Message / Your project" : "Message / Ihr Vorhaben";
-
+            document.getElementById('form-name').placeholder = lang === 'en' ? "Name" : "Ihr Name";
+            document.getElementById('form-email').placeholder = lang === 'en' ? "Email" : "E-Mail";
+            document.getElementById('form-message').placeholder = lang === 'en' ? "Message / Your project" : "Message / Ihr Vorhaben";
             document.getElementById('lang-de').classList.toggle('active', lang === 'de');
             document.getElementById('lang-en').classList.toggle('active', lang === 'en');
+        }
 
-            // Re-observe after DOM changes
-            if(observer) {
-                document.querySelectorAll('.reveal').forEach(el => observer.observe(el));
+        const form = document.getElementById('contact-form');
+        const statusDiv = document.getElementById('form-status');
+        const statusMsg = document.getElementById('status-message');
+        const statusIcon = document.getElementById('status-icon');
+        const spinner = document.getElementById('btn-spinner');
+        const submitBtn = document.getElementById('submit-btn');
+
+        form.addEventListener('submit', async (e) => {
+            e.preventDefault();
+            
+            spinner.classList.remove('hidden');
+            submitBtn.disabled = true;
+
+            const formData = new FormData(form);
+            formData.append("access_key", WEB3FORMS_KEY);
+
+            const object = Object.fromEntries(formData);
+            const json = JSON.stringify(object);
+
+            try {
+                const response = await fetch("https://api.web3forms.com/submit", {
+                    method: "POST",
+                    headers: { "Content-Type": "application/json", "Accept": "application/json" },
+                    body: json
+                });
+                const result = await response.json();
+                
+                if (response.status === 200) {
+                    showStatus(translations[currentLang]['form.success'], 'success');
+                    form.reset();
+                } else {
+                    showStatus(translations[currentLang]['form.error'], 'error');
+                }
+            } catch (error) {
+                showStatus(translations[currentLang]['form.error'], 'error');
+            } finally {
+                spinner.classList.add('hidden');
+                submitBtn.disabled = false;
+            }
+        });
+
+        function showStatus(msg, type) {
+            statusMsg.innerText = msg;
+            statusDiv.classList.remove('hidden');
+            if (type === 'error') {
+                statusIcon.className = "ph-bold ph-warning-circle text-5xl text-red-500";
+            } else {
+                statusIcon.className = "ph-bold ph-check-circle text-5xl text-primary";
             }
         }
 
+        function resetForm() {
+            statusDiv.classList.add('hidden');
+        }
+
         document.addEventListener("DOMContentLoaded", () => {
-            // Initial Translation
             setLanguage('de');
 
-            // --- ANIMATION LOGIC ---
             observer = new IntersectionObserver((entries) => {
                 entries.forEach(entry => {
-                    if (entry.isIntersecting) {
-                        entry.target.classList.add('active');
-                    }
+                    if (entry.isIntersecting) entry.target.classList.add('active');
                 });
-            }, { 
-                threshold: 0.1,
-                rootMargin: "0px 0px -50px 0px" 
-            });
+            }, { threshold: 0.1, rootMargin: "0px 0px -50px 0px" });
 
             document.querySelectorAll('.reveal').forEach(el => observer.observe(el));
 
-            // --- NAVIGATION SPY ---
             const sections = document.querySelectorAll('header, section');
             const navLinks = document.querySelectorAll('#main-nav a');
-            
             const spyObserver = new IntersectionObserver((entries) => {
                 entries.forEach(entry => {
                     if (entry.isIntersecting) {
@@ -596,20 +639,10 @@
 
             sections.forEach(section => spyObserver.observe(section));
 
-            // --- BACK TO TOP ---
             const btt = document.getElementById('backToTop');
             window.addEventListener('scroll', () => {
                 btt.classList.toggle('show', window.scrollY > 300);
             });
-
-            setTimeout(() => {
-                document.querySelectorAll('.reveal').forEach(el => {
-                    const rect = el.getBoundingClientRect();
-                    if (rect.top < window.innerHeight) {
-                        el.classList.add('active');
-                    }
-                });
-            }, 100);
         });
     </script>
 </body>
