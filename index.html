@@ -97,6 +97,7 @@
             opacity: 0;
             transform: translateY(30px);
             transition: all 0.9s cubic-bezier(0.16, 1, 0.3, 1);
+            will-change: transform, opacity;
         }
         .reveal.active {
             opacity: 1;
@@ -119,12 +120,18 @@
 
         .lang-btn {
             cursor: pointer;
-            transition: color 0.3s;
+            width: 32px;
+            height: 32px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            border-radius: 50%;
+            transition: all 0.3s cubic-bezier(0.16, 1, 0.3, 1);
         }
         .lang-btn.active {
-            color: #FF5F1F;
-            text-decoration: underline;
-            text-underline-offset: 4px;
+            background-color: #FF5F1F;
+            color: white;
+            box-shadow: 0 4px 12px rgba(255, 95, 31, 0.2);
         }
     </style>
 </head>
@@ -133,7 +140,8 @@
     <nav class="fixed w-full z-50 glass-nav border-b border-outline-variant">
         <div class="max-w-7xl mx-auto px-6 lg:px-12 py-4 flex justify-between items-center">
             <a href="#home" class="transition-opacity hover:opacity-80">
-                 <img src="logo.png" alt="Logo" class="h-16 w-auto">
+                <img src="logo.png" alt="Logo" class="h-16 w-auto">
+                
                 <!-- <div class="flex items-center gap-2">
                     <i class="ph-fill ph-coffee text-primary text-3xl"></i>
                     <span class="font-display font-bold text-xl tracking-tight">COFFEE MUSE</span>
@@ -148,9 +156,8 @@
                     <a href="#kontakt" class="tertiary-btn" data-i18n="nav.contact">Kontakt</a>
                 </div>
                 
-                <div class="flex items-center gap-3 text-xs font-bold tracking-tighter border-l border-outline-variant pl-8">
+                <div class="flex items-center gap-1 text-[10px] font-bold tracking-tight border-l border-outline-variant pl-8">
                     <button onclick="setLanguage('de')" id="lang-de" class="lang-btn active">DE</button>
-                    <span class="opacity-20">|</span>
                     <button onclick="setLanguage('en')" id="lang-en" class="lang-btn">EN</button>
                 </div>
             </div>
@@ -300,13 +307,15 @@
             </div>
 
             <div class="grid md:grid-cols-2 gap-12">
+                <!-- Home Setup -->
                 <div class="reveal">
-                    <div class="bg-surface-lowest p-12 shadow-ambient rounded-sm h-full">
+                    <div class="bg-surface-lowest p-12 shadow-ambient rounded-sm h-full border-b-8 border-primary/20 hover:border-primary/40 transition-colors">
                         <h3 class="text-xs font-bold uppercase tracking-widest text-primary mb-8">— <span data-i18n="consulting.item1.tag">Privat</span></h3>
                         <h4 class="text-3xl font-display font-bold mb-6" data-i18n="consulting.item1.name">Home Setup</h4>
                         <p class="text-on-surface/60 leading-relaxed" data-i18n="consulting.item1.desc"></p>
                     </div>
                 </div>
+                <!-- Gastro -->
                 <div class="reveal delay-200">
                     <div class="bg-surface-lowest p-12 shadow-ambient rounded-sm h-full border-b-8 border-primary">
                         <h3 class="text-xs font-bold uppercase tracking-widest text-primary mb-8">— <span data-i18n="consulting.item2.tag">Gastro</span></h3>
@@ -519,6 +528,7 @@
         };
 
         let currentLang = 'de';
+        let observer;
 
         function setLanguage(lang) {
             currentLang = lang;
@@ -544,19 +554,32 @@
 
             document.getElementById('lang-de').classList.toggle('active', lang === 'de');
             document.getElementById('lang-en').classList.toggle('active', lang === 'en');
+
+            // Re-observe after DOM changes
+            if(observer) {
+                document.querySelectorAll('.reveal').forEach(el => observer.observe(el));
+            }
         }
 
         document.addEventListener("DOMContentLoaded", () => {
+            // Initial Translation
             setLanguage('de');
 
-            const revealObserver = new IntersectionObserver((entries) => {
+            // --- ANIMATION LOGIC ---
+            observer = new IntersectionObserver((entries) => {
                 entries.forEach(entry => {
-                    if (entry.isIntersecting) entry.target.classList.add('active');
+                    if (entry.isIntersecting) {
+                        entry.target.classList.add('active');
+                    }
                 });
-            }, { threshold: 0.1 });
+            }, { 
+                threshold: 0.1,
+                rootMargin: "0px 0px -50px 0px" 
+            });
 
-            document.querySelectorAll('.reveal').forEach(el => revealObserver.observe(el));
+            document.querySelectorAll('.reveal').forEach(el => observer.observe(el));
 
+            // --- NAVIGATION SPY ---
             const sections = document.querySelectorAll('header, section');
             const navLinks = document.querySelectorAll('#main-nav a');
             
@@ -573,10 +596,20 @@
 
             sections.forEach(section => spyObserver.observe(section));
 
+            // --- BACK TO TOP ---
             const btt = document.getElementById('backToTop');
             window.addEventListener('scroll', () => {
                 btt.classList.toggle('show', window.scrollY > 300);
             });
+
+            setTimeout(() => {
+                document.querySelectorAll('.reveal').forEach(el => {
+                    const rect = el.getBoundingClientRect();
+                    if (rect.top < window.innerHeight) {
+                        el.classList.add('active');
+                    }
+                });
+            }, 100);
         });
     </script>
 </body>
